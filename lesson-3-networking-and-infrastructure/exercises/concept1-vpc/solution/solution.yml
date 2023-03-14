@@ -1,11 +1,11 @@
 Parameters:
 
-  EnvironmentName:
+  ProjectName:
     Type: String
-    Description: Prefix name for our resources
+    Description: Project name used for tagging resources
 
   VpcCIDR: 
-    Description: Please enter the IP range (CIDR notation) for this VPC
+    Description: IP range for the VPC in CIDR notation
     Type: String
 
 Resources:
@@ -17,14 +17,14 @@ Resources:
       EnableDnsHostnames: true
       Tags: 
       - Key: Name 
-        Value: !Ref EnvironmentName            
+        Value: !Ref ProjectName            
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
       - Key: Name
-        Value: !Ref EnvironmentName
+        Value: !Ref ProjectName
 
   InternetGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
