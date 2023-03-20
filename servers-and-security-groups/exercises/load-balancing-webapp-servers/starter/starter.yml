@@ -1,0 +1,49 @@
+Parameters:
+
+  ExerciseName:
+    Type: String
+    Description: Tag name for our resources
+    Default: cd12352-l4-launch-templates-asg
+  AsgDesiredCapacity:
+    Type: String
+    Description: Desired capacity for the fleet of instances
+    Default: 1
+
+Resources:
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Ref ExerciseName
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${ExerciseName}-vpc-id"
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 10.11.0.0/16
+  LaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties: 
+      LaunchTemplateData:
+        ImageId: ami-0557a15b87f6559cf
+        SecurityGroupIds:
+          - !Ref SecurityGroup
+        InstanceType: t3.micro
+        BlockDeviceMappings:
+        - DeviceName: "/dev/sdk"
+          Ebs:
+            VolumeSize: '10'
+  AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier:
+      - Fn::ImportValue: 
+          !Sub "${ExerciseName}-private-subnets"
+      LaunchTemplate:
+        LaunchTemplateId: !Ref LaunchTemplate
+        Version: !GetAtt LaunchTemplate.LatestVersionNumber
+      MinSize: '1'
+      DesiredCapacity: !Ref AsgDesiredCapacity
+      MaxSize: '6'

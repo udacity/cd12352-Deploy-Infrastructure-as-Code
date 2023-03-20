@@ -1,0 +1,53 @@
+Parameters:
+
+  ExerciseName:
+    Type: String
+    Description: Tag name for our resources
+    Default: cd12352-l5-rds
+
+Resources:
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for MyWebAPP database
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${ExerciseName}-vpc-id"
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 3306
+        ToPort: 3306
+        CidrIp: 10.10.0.0/24
+
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: DB subnet group for MyWebAPP database
+      SubnetIds: !Split
+      - ","
+      - Fn::ImportValue:
+          !Sub "${ExerciseName}-private-subnets"
+
+  DBParameterGroup:
+    Type: AWS::RDS::DBParameterGroup
+    Properties:
+      Description: Custom parameter group for MyWebAPP database
+      Family: mysql8.0
+      Parameters:
+        innodb_buffer_pool_instances: 1
+        innodb_buffer_pool_size: 134217728
+        max_connections: 1000
+
+  DBInstance:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Snapshot
+    Properties:
+      DBName: mywebapp
+      DBInstanceClass: db.t3.micro
+      DBInstanceIdentifier: mywebapp-rds-instance
+      Engine: mysql
+      EngineVersion: "8.0.32"
+      DeletionProtection: true
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      DBParameterGroupName: !Ref DBParameterGroup

@@ -1,0 +1,13 @@
+Resources:
+  VPC: 
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.15.0.0/16
+      EnableDnsHostnames: true       
+  PublicSubnet: 
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: 10.15.0.0/24
+      MapPublicIpOnLaunch: true
