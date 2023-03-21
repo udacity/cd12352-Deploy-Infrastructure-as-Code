@@ -3,7 +3,7 @@ Parameters:
   ExerciseName:
     Type: String
     Description: Tag name for our resources
-    Default: cd12352-l4-security-groups
+    Default: udacity-sg-exercise
 
 Resources:
   VPC: 

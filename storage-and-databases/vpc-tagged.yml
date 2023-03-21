@@ -6,7 +6,7 @@ Resources:
       EnableDnsHostnames: true
       Tags: 
       - Key: Name 
-        Value: lesson5-vpc
+        Value: udacity-my-vpc
   PublicSubnet: 
     Type: AWS::EC2::Subnet
     Properties:
@@ -16,4 +16,4 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags: 
       - Key: Name 
-        Value: lesson5-vpc-subnet2
+        Value: udacity-my-subnet

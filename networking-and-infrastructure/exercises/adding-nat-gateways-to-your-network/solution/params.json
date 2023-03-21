@@ -1,7 +1,7 @@
 [
   {
     "ParameterKey": "ProjectName",
-    "ParameterValue": "UdacityProject"
+    "ParameterValue": "udacity-nat-exercise"
   },
   {
     "ParameterKey": "VpcCIDR",

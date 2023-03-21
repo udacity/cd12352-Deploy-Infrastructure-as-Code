@@ -3,7 +3,7 @@ Parameters:
   ExerciseName:
     Type: String
     Description: Tag name for our resources
-    Default: cd12352-l5-rds
+    Default: udacity-rds-exercise
 
 Resources:
 

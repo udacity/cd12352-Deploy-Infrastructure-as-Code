@@ -1,7 +1,7 @@
 [
   {
     "ParameterKey": "ProjectName",
-    "ParameterValue": "udacity-exercise"
+    "ParameterValue": "udacity-subnets-exercise"
   },
   {
     "ParameterKey": "VpcCIDR",

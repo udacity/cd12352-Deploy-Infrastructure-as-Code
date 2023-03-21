@@ -1,7 +1,7 @@
 [
   {
     "ParameterKey": "ProjectName",
-    "ParameterValue": "udacity-exercise"
+    "ParameterValue": "udacity-outputs-exercise"
   },
   {
     "ParameterKey": "VpcCIDR",

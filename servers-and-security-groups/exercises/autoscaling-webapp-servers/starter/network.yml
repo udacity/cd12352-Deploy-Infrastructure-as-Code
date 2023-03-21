@@ -3,7 +3,7 @@ Parameters:
   ExerciseName:
     Type: String
     Description: Tag name for our resources
-    Default: cd12352-l4-launch-templates-asg
+    Default: udacity-lt-asg-exercise
 
 Resources:
 

@@ -20,18 +20,18 @@ fi
 if [ $1 == "deploy" ]
 then
     aws cloudformation deploy \
-        --stack-name d12352-lesson5-parametrizing-scripts \
+        --stack-name udacity-parametrizing-scripts-lesson \
         --template-file vpc.yml
 fi
 if [ $1 == "delete" ]
 then
     aws cloudformation delete-stack \
-        --stack-name d12352-lesson5-parametrizing-scripts \
+        --stack-name udacity-parametrizing-scripts-lesson \
 fi
 if [ $1 == "preview" ]
 then
     aws cloudformation deploy \
-        --stack-name d12352-lesson5-parametrizing-scripts \
+        --stack-name udacity-parametrizing-scripts-lesson \
         --template-file vpc.yml \
         --no-execute-changeset
 fi
