@@ -7,16 +7,11 @@ Resources:
   LBSecGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow http to our load balancer
+      GroupDescription: Allow http access to our load balancer
       VpcId:
         Fn::ImportValue:
           !Sub "${EnvironmentName}-VPCID"
       SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
-        CidrIp: 0.0.0.0/0
-      SecurityGroupEgress:
       - IpProtocol: tcp
         FromPort: 80
         ToPort: 80
@@ -24,19 +19,15 @@ Resources:
   WebServerSecGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow http to our hosts and SSH from local only
+      GroupDescription: Allow http access to our hosts from the LB Security Group
       VpcId:
         Fn::ImportValue:
           !Sub "${EnvironmentName}-VPCID"
       SecurityGroupIngress:
       - IpProtocol: tcp
-        FromPort: 8080
-        ToPort: 8080
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 0.0.0.0/0
+        FromPort: 80
+        ToPort: 80
+        SourceSecurityGroupId: !Ref LBSecGroup
       SecurityGroupEgress:
       - IpProtocol: tcp
         FromPort: 0
@@ -50,9 +41,9 @@ Resources:
           Fn::Base64: !Sub |
             #!/bin/bash
             sudo apt-get update -y
-            sudo apt-get install apache2 -y
-            sudo systemctl start apache2.service  
-        ImageId: ami-0557a15b87f6559cf
+            sudo apt-get install nginx -y
+            sudo service nginx start
+        ImageId: ami-0735c191cf914754d
         SecurityGroupIds:
           - !Ref WebServerSecGroup
         InstanceType: t3.micro
@@ -62,6 +53,59 @@ Resources:
         - DeviceName: "/dev/sdk"
           Ebs:
             VolumeSize: '10'
+  WebAppLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties: 
+      LaunchTemplateName: !Sub "${EnvironmentName}-web-servers"
+      LaunchTemplateData:
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            sudo apt-get update -y
+            sudo apt-get install nginx -y
+            sudo service nginx start
+        ImageId: ami-0735c191cf914754d
+        SecurityGroupIds:
+          - !Ref WebServerSecGroup
+        InstanceType: t3.micro
+        BlockDeviceMappings:
+        - DeviceName: "/dev/sdk"
+          Ebs:
+            VolumeSize: '10'
+        IamInstanceProfile:
+          Name: !Ref WebAppInstanceProfile
+
+  WebAppInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${EnvironmentName}-web-servers"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: 'Allow'
+          Principal:
+            Service:
+            - 'ec2.amazonaws.com'
+          Action:
+          - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: s3
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Action:
+              - 's3:GetObject'
+              Resource:
+                - !Sub "arn:aws:s3:::any-bucket-name/*"
+
+  WebAppInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: '/'
+      Roles:
+      - !Ref WebAppInstanceRole
+
   WebAppGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
@@ -71,8 +115,9 @@ Resources:
       LaunchTemplate:
         LaunchTemplateId: !Ref WebAppLaunchTemplate
         Version: !GetAtt WebAppLaunchTemplate.LatestVersionNumber
-      MinSize: '3'
-      MaxSize: '5'
+      MinSize: '1'
+      DesiredCapacity: '1'
+      MaxSize: '3'
       TargetGroupARNs:
       - Ref: WebAppTargetGroup
   WebAppLB:
@@ -113,7 +158,7 @@ Resources:
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 8
       HealthyThresholdCount: 2
-      Port: 8080
+      Port: 80
       Protocol: HTTP
       UnhealthyThresholdCount: 5
       VpcId: 
