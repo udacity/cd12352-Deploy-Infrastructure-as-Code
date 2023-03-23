@@ -1,4 +1,5 @@
 Parameters:
+
     EnvironmentName:
         Description: An environment name that will be prefixed to resource names
         Type: String
@@ -16,6 +17,7 @@ Resources:
         FromPort: 80
         ToPort: 80
         CidrIp: 0.0.0.0/0
+
   WebServerSecGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -33,26 +35,7 @@ Resources:
         FromPort: 0
         ToPort: 65535
         CidrIp: 0.0.0.0/0
-  WebAppLaunchTemplate:
-    Type: AWS::EC2::LaunchTemplate
-    Properties: 
-      LaunchTemplateData:
-        UserData:
-          Fn::Base64: !Sub |
-            #!/bin/bash
-            sudo apt-get update -y
-            sudo apt-get install nginx -y
-            sudo service nginx start
-        ImageId: ami-0735c191cf914754d
-        SecurityGroupIds:
-          - !Ref WebServerSecGroup
-        InstanceType: t3.micro
-        IamInstanceProfile:
-          Name: !Ref WebAppInstanceProfile
-        BlockDeviceMappings:
-        - DeviceName: "/dev/sdk"
-          Ebs:
-            VolumeSize: '10'
+
   WebAppLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
     Properties: 
@@ -64,7 +47,7 @@ Resources:
             sudo apt-get update -y
             sudo apt-get install nginx -y
             sudo service nginx start
-        ImageId: ami-0735c191cf914754d
+        ImageId: ami-0557a15b87f6559cf
         SecurityGroupIds:
           - !Ref WebServerSecGroup
         InstanceType: t3.micro
@@ -120,6 +103,7 @@ Resources:
       MaxSize: '3'
       TargetGroupARNs:
       - Ref: WebAppTargetGroup
+
   WebAppLB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
@@ -128,6 +112,7 @@ Resources:
       - Fn::ImportValue: !Sub "${EnvironmentName}-PUB2-SN"
       SecurityGroups:
       - Ref: LBSecGroup
+
   Listener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
@@ -139,6 +124,7 @@ Resources:
         Ref: WebAppLB
       Port: '80'
       Protocol: HTTP
+
   ALBListenerRule:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       Properties:
@@ -150,6 +136,7 @@ Resources:
           Values: [/]
         ListenerArn: !Ref 'Listener'
         Priority: 1
+
   WebAppTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
