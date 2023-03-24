@@ -48,5 +48,5 @@ then
         --template-file $TEMPLATE_FILE_NAME \
         --parameter-overrides file://$PARAMETERS_FILE_NAME \
         --no-execute-changeset \
-        --region=$REGION \        
+        --region=$REGION 
 fi

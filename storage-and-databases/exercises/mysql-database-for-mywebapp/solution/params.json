@@ -1,0 +1,10 @@
+[
+    {
+        "ParameterKey": "RdsMasterUsername",
+        "ParameterValue": "myusername"
+    },
+    {
+        "ParameterKey": "RdsMasterPassword",
+        "ParameterValue": "insertanywildpasswordhere"
+    }
+]
