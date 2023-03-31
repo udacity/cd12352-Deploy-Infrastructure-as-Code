@@ -30,7 +30,7 @@ Resources:
         ImageId: ami-0557a15b87f6559cf
         SecurityGroupIds:
           - !Ref SecurityGroup
-        InstanceType: t3.micro
+        InstanceType: t2.micro
         BlockDeviceMappings:
         - DeviceName: "/dev/sdk"
           Ebs:

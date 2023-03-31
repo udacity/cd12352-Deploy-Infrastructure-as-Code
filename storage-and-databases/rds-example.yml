@@ -29,8 +29,8 @@ Resources:
           !Sub "${EnvironmentName}-VPCID"
       SecurityGroupIngress:
       - IpProtocol: tcp
-        FromPort: 3306
-        ToPort: 3306
+        FromPort: 5432
+        ToPort: 5432
         CidrIp: 10.10.0.0/24
 
   DBSubnetGroup:
@@ -63,6 +63,8 @@ Resources:
       DBName: exampledb
       DBInstanceClass: db.t3.micro
       DBInstanceIdentifier: !Ref ExampleName
+      VPCSecurityGroups:
+        - !Ref SecurityGroup
       Engine: postgres
       EngineVersion: "15.2"
       DBSubnetGroupName: !Ref DBSubnetGroup
